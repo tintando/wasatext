@@ -1,0 +1,20 @@
+# Development configuration for WASAText
+# This configuration provides development-friendly settings
+
+debug: true
+
+db:
+  filename: "./wasatext.db"
+
+photos:
+  basepath: "./photos"
+  userspath: "./photos/users"
+  groupspath: "./photos/groups"
+  messagespath: "./photos/messages"
+
+web:
+  apihost: "0.0.0.0:3000"
+  debughost: "0.0.0.0:4000"
+  readtimeout: "10s"
+  writetimeout: "10s"
+  shutdowntimeout: "10s"

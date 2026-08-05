@@ -1,0 +1,100 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+*.pdf
+*.txt
+WASAText.pdf
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node.js (will be handled in multi-stage build)
+webui/node_modules/
+webui/dist/
+webui/.vite/
+webui/yarn-error.log
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+webapi
+
+# Build artifacts
+vendor/
+
+# Runtime data that should not be in image
+photos/
+*.db
+*.sqlite
+*.sqlite3
+
+# Test files
+tests/
+test_*
+
+# Development config
+demo/
+open-node.sh
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# IDE files
+.vscode/
+
+# Log files
+*.log
+logs/
+
+# Environment files (should be passed via docker-compose or runtime)
+.env
+.env.local
+.env.*.local
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Linux
+*~
+
+# Editor backups
+*.bak
+*.orig
+
+# Coverage reports
+coverage.txt
+*.cover
+
+# Binaries
+bin/
+build/
+

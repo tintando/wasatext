@@ -1,0 +1,80 @@
+# Backend Dockerfile for WASAText
+# Builds the Go backend with embedded frontend or standalone
+
+# Stage 1: Build the Go backend
+FROM golang:1.17-alpine AS builder
+
+WORKDIR /build
+
+# Install necessary packages
+RUN apk add --no-cache git gcc musl-dev sqlite-dev
+
+# Copy go mod files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build argument to determine if WebUI should be embedded
+ARG EMBED_WEBUI=false
+
+# Create empty webui/dist directory if not embedding
+RUN if [ "$EMBED_WEBUI" = "false" ]; then \
+      mkdir -p ./webui/dist; \
+    fi
+
+# Build the binary with or without embedded WebUI
+RUN if [ "$EMBED_WEBUI" = "true" ]; then \
+      CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -tags webui -o wasatext ./cmd/webapi/; \
+    else \
+      CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o wasatext ./cmd/webapi/; \
+    fi
+
+# Stage 2: Final runtime image
+FROM alpine:latest
+
+# Install necessary packages
+RUN apk --no-cache add ca-certificates sqlite tzdata wget
+
+# Create non-root user
+RUN addgroup -g 1000 wasatext && \
+    adduser -u 1000 -G wasatext -s /bin/sh -D wasatext
+
+# Create directories for data persistence
+RUN mkdir -p /data/database /data/photos /data/photos/users /data/photos/groups /data/photos/messages && \
+    chown -R wasatext:wasatext /data
+
+# Create config directory
+RUN mkdir -p /conf && chown wasatext:wasatext /conf
+
+WORKDIR /home/wasatext
+
+# Copy the binary from builder stage
+COPY --from=builder /build/wasatext .
+
+# Copy default configuration
+COPY --chown=wasatext:wasatext production.yml /conf/config.yml
+
+# Change ownership of the binary
+RUN chown wasatext:wasatext wasatext && chmod +x wasatext
+
+# Switch to non-root user
+USER wasatext
+
+# Expose the port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --quiet --tries=1 --timeout=5 -O /dev/null http://localhost:3000/liveness || exit 1
+
+# Set environment variables for container-friendly defaults
+ENV CFG_DB_FILENAME=/data/database/wasatext.db
+ENV CFG_WEB_APIHOST=0.0.0.0:3000
+ENV CFG_CONFIG_PATH=/conf/config.yml
+
+# Command to run the application
+CMD ["./wasatext"]

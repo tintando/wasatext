@@ -1,0 +1,29 @@
+# Production configuration for WASAText
+# This file can be mounted into the container to override defaults
+
+# Logging configuration
+log:
+  level: info
+  json: false
+  destination: stdout
+
+# Web server configuration
+web:
+  apihost: 0.0.0.0:3000
+  readtimeout: 10s
+  writetimeout: 10s
+  shutdowntimeout: 15s
+
+# Database configuration (will be overridden by environment variables)
+db:
+  filename: /data/database/wasatext.db
+
+# Photo storage configuration (will be overridden by environment variables)
+photos:
+  basepath: /data/photos
+  userspath: /data/photos/users
+  groupspath: /data/photos/groups
+  messagespath: /data/photos/messages
+
+# Disable debug mode in production
+debug: false

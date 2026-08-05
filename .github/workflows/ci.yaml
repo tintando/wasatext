@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+---
+name: ci
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      # go.mod declares 1.17, which is long out of support. Building on a
+      # current toolchain is the useful signal, and the module is compatible.
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.24"
+
+      # CGO stays on: mattn/go-sqlite3 compiles the amalgamation and will not
+      # build without it. Dependencies are vendored, so nothing is fetched.
+      #
+      # The `webui` build tag is deliberately omitted. It embeds webui/dist,
+      # which only exists after a frontend build, so tagging here would fail
+      # on a missing directory rather than on anything real.
+      - run: go build -mod=vendor ./...
+      - run: go vet -mod=vendor ./...

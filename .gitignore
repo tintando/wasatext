@@ -1,0 +1,29 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries and coverage output
+*.test
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+# Go workspace
+go.work
+go.work.sum
+
+# Secrets
+.env
+
+# Editor
+.vscode/
+
+# Uploaded photos
+photos/
+
+# Vite dependency cache
+.vite/

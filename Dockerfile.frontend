@@ -1,0 +1,11 @@
+# Build stage
+FROM node:18 as builder
+WORKDIR /app
+COPY webui/ ./
+RUN yarn install --frozen-lockfile
+RUN yarn build-prod
+
+# Run stage
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
